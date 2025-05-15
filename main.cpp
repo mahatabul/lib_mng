@@ -2,9 +2,8 @@
 
 using namespace std;
 
-
-
-void printAsciiArt() {
+void printAsciiArt()
+{
     std::cout << u8R"(
   /$$$$$$  /$$$$$$$   /$$$$$$        /$$       /$$ /$$                                             
  /$$__  $$| $$__  $$ /$$__  $$      | $$      |__/| $$                                             
@@ -405,6 +404,49 @@ public:
         addMember(name, memid, password);
     }
 
+    void remove_book()
+    {
+        if (books.empty())
+        {
+            cout << "No books available to remove.\n";
+            return;
+        }
+        book_list();
+        cout << "Enter the number of the book to remove: ";
+        int choice;
+        cin >> choice;
+        if (choice >= 1 && choice <= books.size())
+        {
+            books.erase(books.begin() + (choice - 1));
+            cout << "Book removed successfully.\n";
+        }
+        else
+        {
+            cout << "Invalid book number.\n";
+        }
+    }
+    void remove_member()
+    {
+        if (members.empty())
+        {
+            cout << "No members available to remove.\n";
+            return;
+        }
+        member_list();
+        cout << "Enter the number of the member to remove: ";
+        int choice;
+        cin >> choice;
+        if (choice >= 1 && choice <= members.size())
+        {
+            members.erase(members.begin() + (choice - 1));
+            cout << "Member removed successfully.\n";
+        }
+        else
+        {
+            cout << "Invalid member number.\n";
+        }
+    }
+
     void add_admin()
     {
         string name, password;
@@ -438,8 +480,6 @@ public:
         members[i - 1].show_details();
     }
 };
-
-
 
 int main()
 {
