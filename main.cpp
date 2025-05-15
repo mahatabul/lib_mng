@@ -76,9 +76,33 @@ public:
         this->memID = id;
         this->password = p;
     }
+
+    string borrow_book()
+    {
+        cout << "Borrowing book..\n";
+        cout << "Enter book name: ";
+        string title;
+        getline(cin >> ws, title);
+
+        return title;
+    }
+    void borrow_book_logic(Book name)
+    {
+
+        if (borrowed.size() > 5)
+        {
+            cout << "Sorry Already 5 books borrowed..";
+            return;
+        }
+
+        borrowed.push_back(name);
+        cout << "Book borrowed successfully!!";
+        return;
+    }
     string get_name() { return name; }
     string get_memID() { return memID; }
     string get_password() { return password; }
+    int get_borrowed() { return borrowed.size(); }
 };
 
 class Admin
@@ -125,6 +149,76 @@ private:
     vector<Member> members;
     vector<Admin> admins;
 
+    Book get_the_book(string title)
+    {
+        for (auto it : books)
+        {
+            if (it.get_title() == title)
+            {
+                return it;
+            }
+        }
+    }
+    Member *get_the_member(string name)
+    {
+        for (auto &it : members)
+        {
+            if (it.get_name() == name)
+            {
+                return &it;
+            }
+        }
+        return nullptr;
+    }
+
+    bool check_member(Member m)
+    {
+        for (auto it : members)
+        {
+            if (it.get_name() == m.get_name())
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+    bool check_book(string name)
+    {
+        for (auto it : books)
+        {
+            if (it.get_title() == name)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    void giving_book(Member &m)
+    {
+
+        if (check_member(m))
+        {
+            string book_name = m.borrow_book();
+            if (check_book(book_name))
+            {
+                if (m.get_borrowed() <= 5)
+                {
+                    Book bb = get_the_book(book_name);
+                    m.borrow_book_logic(bb);
+                }
+            }
+            else
+            {
+                cout << "\n Book not available\n";
+            }
+        }
+        else
+        {
+            cout << "\n Not a member!!!\n";
+        }
+    }
+
     void addBook(string title = "", string author = "", string pub = "", int e = 0, bool aval = true)
     {
         Book b(title, author, pub, e, aval);
@@ -142,6 +236,12 @@ private:
     }
     void book_list()
     {
+        if (books.size() == 0)
+        {
+            cout << "No book available..\n";
+            return;
+        }
+
         int i = 1;
         cout << "List of Books\n";
         for (auto it : books)
@@ -150,25 +250,91 @@ private:
         }
     }
 
-public:
-    Library()
+    void member_list()
     {
-        Admin a("admin", "shika noko");
-        admins.push_back(a);
-        
+        if (members.size() == 0)
+        {
+            cout << "No members available..\n";
+            return;
+        }
+
+        int i = 1;
+        cout << "List of members\n";
+        for (auto it : members)
+        {
+            cout << i++ << "." << it.get_name() << "\n";
+        }
     }
-    void verify_Member(string n, string p)
+
+    void admin_list()
+    {
+        if (admins.size() == 0)
+        {
+            cout << "No admins available..\n";
+            return;
+        }
+
+        int i = 1;
+        cout << "List of admins\n";
+        for (auto it : admins)
+        {
+            cout << i++ << "." << it.get_name() << "\n";
+        }
+    }
+
+    bool verify_Member_logic(string n, string p)
     {
         for (auto it : members)
         {
             if (it.get_name() == n and it.get_password() == p)
             {
-                cout << "Welcome " << it.get_name() << " ! \n";
-                return;
+
+                return true;
             }
         }
 
-        cout<<"No such user found... Wrong name or passoword \n"; return;
+        return false;
+    }
+
+public:
+    Library()
+    {
+        Admin a("admin", "shika noko");
+        admins.push_back(a);
+    }
+
+    void giving_books()
+    {
+
+        cout << "Enter your name to borrow book: ";
+        string name;
+        getline(cin >> ws, name);
+
+        Member *m = get_the_member(name);
+        if (m == nullptr)
+        {
+            cout << "You are not a member!!";
+            return;
+        }
+
+        giving_book(*m);
+    }
+    void verify_Member(string n, string p)
+    {
+
+        if (verify_Member_logic(n, p))
+        {
+            Member *m = get_the_member(n);
+
+            cout << "Welcome " << m->get_name() << endl;
+        }
+
+        else
+        {
+            cout << "Wrong name or password..\n";
+        }
+
+        return;
     }
     void verify_Admin(string n, string p)
     {
@@ -181,7 +347,8 @@ public:
             }
         }
 
-        cout<<"No such admin found... Wrong name or passoword \n"; return;
+        cout << "No such admin found... Wrong name or passoword \n";
+        return;
     }
     void add_book()
     {
@@ -190,11 +357,11 @@ public:
         int e;
         cout << "Adding new book....\n";
         cout << "Set title: ";
-        getline(cin>>ws,title);
+        getline(cin >> ws, title);
         cout << "\nSet Author: ";
-        getline(cin,author);
+        getline(cin, author);
         cout << "\nSet Publisher: ";
-        getline(cin,pub);
+        getline(cin, pub);
         cout << "\nSet Editon: ";
         cin >> e;
 
@@ -205,11 +372,11 @@ public:
         string name, memid, password;
         cout << "Adding new member....\n";
         cout << "Set Name: ";
-        getline(cin>>ws,name);
+        getline(cin >> ws, name);
         cout << "\nSet memID: ";
-        getline(cin,memid);
+        getline(cin, memid);
         cout << "\nSet Password: ";
-        getline(cin,password);
+        getline(cin, password);
 
         addMember(name, memid, password);
     }
@@ -218,9 +385,9 @@ public:
         string name, password;
         cout << "Adding new admin....\n";
         cout << "Set Name: ";
-        getline(cin>>ws,name);
+        getline(cin >> ws, name);
         cout << "\nSet Password: ";
-        getline(cin,password);
+        getline(cin, password);
 
         addAdmin(name, password);
     }
@@ -228,7 +395,15 @@ public:
     {
         book_list();
     }
-    void inquiry()
+    void show_admin_list()
+    {
+        admin_list();
+    }
+    void show_member_list()
+    {
+        member_list();
+    }
+    void inquiry_books()
     {
 
         book_list();
@@ -237,10 +412,26 @@ public:
         cin >> i;
         books[i - 1].book_details();
     }
+    void inquiry_members()
+    {
+
+        member_list();
+        cout << "Choose member to inquire: ";
+        int i;
+        cin >> i;
+        members[i - 1].mem_details();
+    }
 };
 int main()
 {
-    
+    system("clear");
+    Library lib;
+    lib.add_book();
+    system("clear");
+    lib.add_member();
+    system("clear");
+    lib.giving_books();
+    cout << "\n";
 
     return 0;
 }
