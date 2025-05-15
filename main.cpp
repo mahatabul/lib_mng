@@ -3,10 +3,8 @@
 using namespace std;
 using ll = long long;
 
-#define fastio                        \
-    ios_base::sync_with_stdio(false); \
-    cin.tie(0);                       \
-    cout.tie(0);
+class Member;
+class Admin;
 
 class Book
 {
@@ -45,8 +43,14 @@ public:
     int get_edition() { return edition; }
 };
 
+
+
+
+
 class Member
 {
+    friend class Admin;
+
 private:
     string name;
     string memID;
@@ -60,8 +64,16 @@ public:
     void mem_details()
     {
         cout << "\nMember Details\n";
-        cout << this->name << endl;
-        cout << this->memID << endl;
+        cout <<"Name: "<< this->name << endl;
+        cout <<"Member ID: "<<this->memID << endl;
+        
+    }
+    void mem_full_details()
+    {
+        cout << "\nFull Details\n";
+        cout <<"Name: "<< this->name << endl;
+        cout <<"Member ID: "<<this->memID << endl;
+        cout<<"Password: "<<this->password<<endl;
     }
     void setmem_details(string n, string id, string p)
     {
@@ -73,6 +85,35 @@ public:
     string get_memID() { return memID; }
 };
 
+class Admin
+{
+private:
+    string name, password;
+
+public:
+    Admin(string n, string p)
+        : name(n), password(p) {}
+
+    void admin_details()
+    {
+        cout << "\nAdmin Details\n";
+        cout << this->name << endl;
+    }
+    void setadmin_details(string n, string p)
+    {
+        this->name = n;
+
+        this->password = p;
+    }
+    string get_name() { return name; }
+
+    void get_Member_full_details(Member& a){
+
+        a.mem_full_details();
+        
+
+    }
+};
 
 class Library
 {
@@ -148,6 +189,8 @@ public:
 };
 int main()
 {
+
+    
 
     return 0;
 }
