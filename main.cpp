@@ -1,7 +1,6 @@
 #include <bits/stdc++.h>
 
 using namespace std;
-using ll = long long;
 
 class Member;
 class Admin;
@@ -306,18 +305,22 @@ public:
     void giving_books()
     {
 
-        cout << "Enter your name to borrow book: ";
-        string name;
+        cout << "Enter your name and password to borrow book\n";
+        cout << "Enter name: ";
+        string name, password;
         getline(cin >> ws, name);
+        cout << "Enter password: ";
+        getline(cin, password);
 
-        Member *m = get_the_member(name);
-        if (m == nullptr)
+        if (verify_Member_logic(name, password))
         {
-            cout << "You are not a member!!";
+            Member *m = get_the_member(name);
+
+            giving_book(*m);
             return;
         }
-
-        giving_book(*m);
+        cout << "You are not a member!!";
+        return;
     }
     void verify_Member(string n, string p)
     {

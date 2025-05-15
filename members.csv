@@ -1,5 +1,5 @@
-Name,MemberID,Password
-Alice,M001,alice@123
-Bob ,M002,bobsecure
-Charlie ,M003,charliepass
-Bruce ,M004,batman123
+Name,MemberID,Password,borrowed
+Alice,M001,alice@123,0
+Bob ,M002,bobsecure,0
+Charlie ,M003,charliepass,0
+Bruce ,M004,batman123,0
