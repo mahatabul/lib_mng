@@ -43,10 +43,6 @@ public:
     int get_edition() { return edition; }
 };
 
-
-
-
-
 class Member
 {
     friend class Admin;
@@ -64,16 +60,15 @@ public:
     void mem_details()
     {
         cout << "\nMember Details\n";
-        cout <<"Name: "<< this->name << endl;
-        cout <<"Member ID: "<<this->memID << endl;
-        
+        cout << "Name: " << this->name << endl;
+        cout << "Member ID: " << this->memID << endl;
     }
     void mem_full_details()
     {
         cout << "\nFull Details\n";
-        cout <<"Name: "<< this->name << endl;
-        cout <<"Member ID: "<<this->memID << endl;
-        cout<<"Password: "<<this->password<<endl;
+        cout << "Name: " << this->name << endl;
+        cout << "Member ID: " << this->memID << endl;
+        cout << "Password: " << this->password << endl;
     }
     void setmem_details(string n, string id, string p)
     {
@@ -83,6 +78,7 @@ public:
     }
     string get_name() { return name; }
     string get_memID() { return memID; }
+    string get_password() { return password; }
 };
 
 class Admin
@@ -97,7 +93,13 @@ public:
     void admin_details()
     {
         cout << "\nAdmin Details\n";
-        cout << this->name << endl;
+        cout << "Admin name: " << this->name << endl;
+    }
+    void admin_full_details()
+    {
+        cout << "\nAdmin Details\n";
+        cout << "Admin name: " << this->name << endl;
+        cout << "Admin Password: " << this->password << endl;
     }
     void setadmin_details(string n, string p)
     {
@@ -106,12 +108,12 @@ public:
         this->password = p;
     }
     string get_name() { return name; }
+    string get_password() { return password; }
 
-    void get_Member_full_details(Member& a){
+    void get_Member_full_details(Member &a)
+    {
 
         a.mem_full_details();
-        
-
     }
 };
 
@@ -121,6 +123,7 @@ class Library
 private:
     vector<Book> books;
     vector<Member> members;
+    vector<Admin> admins;
 
     void addBook(string title = "", string author = "", string pub = "", int e = 0, bool aval = true)
     {
@@ -131,6 +134,11 @@ private:
     {
         Member m(n, id, pass);
         members.push_back(m);
+    }
+    void addAdmin(string n = "", string pass = "")
+    {
+        Admin m(n, pass);
+        admins.push_back(m);
     }
     void book_list()
     {
@@ -143,6 +151,38 @@ private:
     }
 
 public:
+    Library()
+    {
+        Admin a("admin", "shika noko");
+        admins.push_back(a);
+        
+    }
+    void verify_Member(string n, string p)
+    {
+        for (auto it : members)
+        {
+            if (it.get_name() == n and it.get_password() == p)
+            {
+                cout << "Welcome " << it.get_name() << " ! \n";
+                return;
+            }
+        }
+
+        cout<<"No such user found... Wrong name or passoword \n"; return;
+    }
+    void verify_Admin(string n, string p)
+    {
+        for (auto it : admins)
+        {
+            if (it.get_name() == n and it.get_password() == p)
+            {
+                cout << "Welcome " << it.get_name() << " ! \n";
+                return;
+            }
+        }
+
+        cout<<"No such admin found... Wrong name or passoword \n"; return;
+    }
     void add_book()
     {
 
@@ -150,11 +190,11 @@ public:
         int e;
         cout << "Adding new book....\n";
         cout << "Set title: ";
-        cin >> title;
+        getline(cin>>ws,title);
         cout << "\nSet Author: ";
-        cin >> author;
+        getline(cin,author);
         cout << "\nSet Publisher: ";
-        cin >> pub;
+        getline(cin,pub);
         cout << "\nSet Editon: ";
         cin >> e;
 
@@ -165,13 +205,24 @@ public:
         string name, memid, password;
         cout << "Adding new member....\n";
         cout << "Set Name: ";
-        cin >> name;
+        getline(cin>>ws,name);
         cout << "\nSet memID: ";
-        cin >> memid;
+        getline(cin,memid);
         cout << "\nSet Password: ";
-        cin >> password;
+        getline(cin,password);
 
         addMember(name, memid, password);
+    }
+    void add_admin()
+    {
+        string name, password;
+        cout << "Adding new admin....\n";
+        cout << "Set Name: ";
+        getline(cin>>ws,name);
+        cout << "\nSet Password: ";
+        getline(cin,password);
+
+        addAdmin(name, password);
     }
     void show_book_list()
     {
@@ -189,7 +240,6 @@ public:
 };
 int main()
 {
-
     
 
     return 0;
