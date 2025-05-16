@@ -1,4 +1,5 @@
 #include <bits/stdc++.h>
+#include <cstdlib>
 
 using namespace std;
 
@@ -31,14 +32,14 @@ class Book : public User
 {
 protected:
     string title;
-    bool avail;
+    int quantity;
     string author;
     string publisher;
     int edition;
 
 public:
-    Book(string t, string auth, string pub, int e, bool av)
-        : title(t), author(auth), publisher(pub), edition(e), avail(av) {}
+    Book(string t, string auth, string pub, int e, int av)
+        : title(t), author(auth), publisher(pub), edition(e), quantity(av) {}
 
     void show_details() override
     {
@@ -47,22 +48,31 @@ public:
         cout << "Author: " << author << endl;
         cout << "Publisher: " << publisher << endl;
         cout << "Edition: " << edition << endl;
-        cout << "Available: " << (avail ? "Yes" : "No") << endl;
+        cout << "Available: " << (quantity > 0 ? "Yes" : "No") << endl;
+        cout << "Copies Available: " << quantity << endl;
     }
 
-    void set_book_details(string t, string auth, string pub, int e, bool av)
+    void set_book_details(string t, string auth, string pub, int e, int av)
     {
         title = t;
         author = auth;
         publisher = pub;
         edition = e;
-        avail = av;
+        quantity = av;
     }
 
     string get_title() { return title; }
     string get_author() { return author; }
     string get_publisher() { return publisher; }
     int get_edition() { return edition; }
+
+    void decrease_quantity()
+    {
+        if (quantity > 0)
+            quantity--;
+    }
+    void increase_quantity() { quantity++; }
+    bool is_available() { return quantity > 0; }
 };
 
 class Member : public User
@@ -84,6 +94,7 @@ public:
         cout << "\nMember Details\n";
         cout << "Name: " << name << endl;
         cout << "Member ID: " << memID << endl;
+        cout << "Number of borrowed Books: " << borrowed.size() << endl;
     }
 
     void mem_full_details()
@@ -101,6 +112,38 @@ public:
         password = p;
     }
 
+    string return_book()
+    {
+        if (borrowed.empty())
+        {
+            cout << "You have no borrowed books to return.\n";
+            return "";
+        }
+
+        cout << "\nYour Borrowed Books:\n";
+        for (int i = 0; i < borrowed.size(); i++)
+        {
+            cout << i + 1 << ". " << borrowed[i].get_title() << endl;
+        }
+
+        cout << "Enter the number of the book to return: ";
+        int choice;
+        cin >> choice;
+
+        if (choice >= 1 && choice <= borrowed.size())
+        {
+            string title = borrowed[choice - 1].get_title();
+            borrowed.erase(borrowed.begin() + (choice - 1));
+            cout << "Book returned successfully.\n";
+            return title;
+        }
+        else
+        {
+            cout << "Invalid choice.\n";
+            return "";
+        }
+    }
+
     string borrow_book()
     {
         cout << "Borrowing book..\n";
@@ -112,6 +155,14 @@ public:
 
     void borrow_book_logic(Book name)
     {
+        for (auto &b : borrowed)
+        {
+            if (b.get_title() == name.get_title())
+            {
+                cout << "You already borrowed this book.\n";
+                return;
+            }
+        }
         if (borrowed.size() >= 5)
         {
             cout << "Sorry Already 5 books borrowed..";
@@ -119,6 +170,23 @@ public:
         }
         borrowed.push_back(name);
         cout << "Book borrowed successfully!!";
+    }
+
+    void showBorrowedBooks()
+    {
+        cout << "\n--- Borrowed Books List ---\n";
+        if (borrowed.empty())
+        {
+            cout << "No books have been borrowed yet.\n";
+        }
+        else
+        {
+            for (size_t i = 0; i < borrowed.size(); ++i)
+            {
+                cout << i + 1 << ". " << borrowed[i].get_title() << "\n";
+            }
+        }
+        cout << endl;
     }
 
     string get_name() { return name; }
@@ -171,7 +239,7 @@ private:
     vector<Member> members;
     vector<Admin> admins;
 
-    Book get_the_book(string title)
+    Book &get_the_book(string title)
     {
         for (auto &it : books)
         {
@@ -181,18 +249,6 @@ private:
             }
         }
         throw runtime_error("Book not found");
-    }
-
-    Member *get_the_member(string name)
-    {
-        for (auto &it : members)
-        {
-            if (it.get_name() == name)
-            {
-                return &it;
-            }
-        }
-        return nullptr;
     }
 
     bool check_member(Member m)
@@ -211,7 +267,7 @@ private:
     {
         for (auto &it : books)
         {
-            if (it.get_title() == name)
+            if (it.get_title() == name and it.is_available())
             {
                 return true;
             }
@@ -228,8 +284,9 @@ private:
             {
                 if (m.get_borrowed() < 5)
                 {
-                    Book bb = get_the_book(book_name);
+                    Book &bb = get_the_book(book_name);
                     m.borrow_book_logic(bb);
+                    bb.decrease_quantity();
                 }
                 else
                 {
@@ -247,7 +304,7 @@ private:
         }
     }
 
-    void addBook(string title = "", string author = "", string pub = "", int e = 0, bool aval = true)
+    void addBook(string title = "", string author = "", string pub = "", int e = 0, int aval = 0)
     {
         Book b(title, author, pub, e, aval);
         books.push_back(b);
@@ -321,12 +378,34 @@ private:
         }
         return false;
     }
+    bool verify_Admin_logic(string n, string p)
+    {
+        for (auto &it : admins)
+        {
+            if (it.get_name() == n && it.get_password() == p)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
 
 public:
     Library()
     {
         Admin a("admin", "shika noko");
         admins.push_back(a);
+    }
+    Member *get_the_member(string name)
+    {
+        for (auto &it : members)
+        {
+            if (it.get_name() == name)
+            {
+                return &it;
+            }
+        }
+        return nullptr;
     }
 
     void giving_books()
@@ -349,12 +428,37 @@ public:
         }
     }
 
+    void return_book_by_member()
+    {
+        cout << "Enter your name and password to return a book\n";
+        cout << "Enter name: ";
+        string name, password;
+        getline(cin >> ws, name);
+        cout << "Enter password: ";
+        getline(cin, password);
+
+        if (verify_Member_logic(name, password))
+        {
+            Member *m = get_the_member(name);
+            string returned_title = m->return_book();
+            if (!returned_title.empty())
+            {
+                Book &b = get_the_book(returned_title);
+                b.increase_quantity();
+            }
+        }
+        else
+        {
+            cout << "Invalid credentials. You are not a member.\n";
+        }
+    }
+
     void verify_Member(string n, string p)
     {
         if (verify_Member_logic(n, p))
         {
-            Member *m = get_the_member(n);
-            cout << "Welcome " << m->get_name() << endl;
+
+            cout << "Welcome " << n << endl;
         }
         else
         {
@@ -362,23 +466,32 @@ public:
         }
     }
 
+    bool verify_Member_bool(string n, string p)
+    {
+        return verify_Member_logic(n, p);
+    }
+
     void verify_Admin(string n, string p)
     {
-        for (auto &it : admins)
+        if (verify_Admin_logic(n, p))
         {
-            if (it.get_name() == n && it.get_password() == p)
-            {
-                cout << "Welcome " << it.get_name() << " ! \n";
-                return;
-            }
+            cout << "Welcome " << n << endl;
+            return;
         }
+
         cout << "No such admin found... Wrong name or password \n";
+        return;
+    }
+
+    bool verify_Admin_bool(string n, string p)
+    {
+        return verify_Admin_logic(n, p);
     }
 
     void add_book()
     {
         string title, author, pub;
-        int e;
+        int e, quantity;
         cout << "Adding new book....\n";
         cout << "Set title: ";
         getline(cin >> ws, title);
@@ -388,7 +501,9 @@ public:
         getline(cin, pub);
         cout << "\nSet Edition: ";
         cin >> e;
-        addBook(title, author, pub, e, true);
+        cout << "\nSet Quantity: ";
+        cin >> quantity;
+        addBook(title, author, pub, e, quantity);
     }
 
     void add_member()
@@ -481,7 +596,194 @@ public:
     }
 };
 
+void clear_screen()
+{
+#ifdef _WIN32
+    system("cls");
+#else
+    system("clear");
+#endif
+}
+
 int main()
 {
+    Library library;
+    int main_choice;
+
+    while (true)
+    {
+        clear_screen();
+        printAsciiArt();
+        cout << "\n==== Library Management System ====\n";
+        cout << "1. Admin Panel\n";
+        cout << "2. Member Panel\n";
+        cout << "3. Exit\n";
+        cout << "Enter your choice: ";
+        cin >> main_choice;
+
+        if (main_choice == 1)
+        {
+            string name, pass;
+            clear_screen();
+            printAsciiArt();
+            cout << "Admin Login\n";
+            cout << "Enter Name: ";
+            getline(cin >> ws, name);
+            cout << "Enter Password: ";
+            getline(cin, pass);
+
+            bool is_admin = library.verify_Admin_bool(name, pass);
+
+            if (is_admin)
+            {
+                int admin_choice;
+                while (true)
+                {
+                    clear_screen();
+                    printAsciiArt();
+                    cout << "\n==== Admin Panel ====\n";
+                    cout << "1. Add Book\n";
+                    cout << "2. Remove Book\n";
+                    cout << "3. Add Member\n";
+                    cout << "4. Remove Member\n";
+                    cout << "5. Add Admin\n";
+                    cout << "6. View Book List\n";
+                    cout << "7. View Member List\n";
+                    cout << "8. View Admin List\n";
+                    cout << "9. Inquire Book Details\n";
+                    cout << "10. Inquire Member Details\n";
+                    cout << "0. Back to Main Menu\n";
+                    cout << "Enter your choice: ";
+                    cin >> admin_choice;
+
+                    switch (admin_choice)
+                    {
+                    case 1:
+                        library.add_book();
+                        break;
+                    case 2:
+                        library.remove_book();
+                        break;
+                    case 3:
+                        library.add_member();
+                        break;
+                    case 4:
+                        library.remove_member();
+                        break;
+                    case 5:
+                        library.add_admin();
+                        break;
+                    case 6:
+                        library.show_book_list();
+                        break;
+                    case 7:
+                        library.show_member_list();
+                        break;
+                    case 8:
+                        library.show_admin_list();
+                        break;
+                    case 9:
+                        library.inquiry_books();
+                        break;
+                    case 10:
+                        library.inquiry_members();
+                        break;
+                    case 0:
+                        goto main_menu;
+                    default:
+                        cout << "Invalid choice.\n";
+                        break;
+                    }
+                    cout << "\nPress Enter to continue...";
+                    cin.ignore();
+                    cin.get();
+                }
+            }
+            else
+            {
+                cout << "Invalid admin credentials.\n";
+                cin.ignore();
+                cin.get();
+            }
+        }
+        else if (main_choice == 2)
+        {
+            string name, pass;
+            clear_screen();
+            printAsciiArt();
+            cout << "Member Login\n";
+            cout << "Enter Name: ";
+            getline(cin >> ws, name);
+            cout << "Enter Password: ";
+            getline(cin, pass);
+
+            bool is_member = library.verify_Member_bool(name, pass);
+           
+
+            if (is_member)
+            {
+                Member *m = library.get_the_member(name);
+
+                int mem_choice;
+                while (true)
+                {
+                    clear_screen();
+                    printAsciiArt();
+                    cout << "\n==== Member Panel ====\n";
+                    cout << "1. Borrow Book\n";
+                    cout << "2. Return Book\n";
+                    cout << "3. List Borrowed Books\n";
+                    cout << "0. Back to Main Menu\n";
+                    cout << "Enter your choice: ";
+                    cin >> mem_choice;
+
+                    switch (mem_choice)
+                    {
+                    case 1:
+                        library.giving_books();
+                        break;
+                    case 2:
+                        library.return_book_by_member();
+                        break;
+                    case 3:
+
+                        m->showBorrowedBooks();
+
+                        break;
+                    case 0:
+                        goto main_menu;
+                    default:
+                        cout << "Invalid choice.\n";
+                        break;
+                    }
+                    cout << "\nPress Enter to continue...";
+                    cin.ignore();
+                    cin.get();
+                }
+            }
+
+            else
+            {
+                cout << "Invalid user credentials.\n";
+                cin.ignore();
+                cin.get();
+            }
+        }
+        else if (main_choice == 3)
+        {
+            cout << "Exiting Library System. Goodbye!\n";
+            break;
+        }
+        else
+        {
+            cout << "Invalid choice.\n";
+            cin.ignore();
+            cin.get();
+        }
+
+    main_menu:
+        continue;
+    }
+
     return 0;
 }
