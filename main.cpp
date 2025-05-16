@@ -580,19 +580,27 @@ public:
     void inquiry_books()
     {
         book_list();
-        cout << "Choose book to inquire: ";
-        int i;
-        cin >> i;
-        books[i - 1].show_details();
+        if (books.size())
+        {
+            cout << "Choose book to inquire: ";
+            int i;
+            cin >> i;
+            books[i - 1].show_details();
+        }
+        return;
     }
 
     void inquiry_members()
     {
         member_list();
-        cout << "Choose member to inquire: ";
-        int i;
-        cin >> i;
-        members[i - 1].show_details();
+        if (members.size())
+        {
+            cout << "Choose member to inquire: ";
+            int i;
+            cin >> i;
+            members[i - 1].show_details();
+        }
+        return;
     }
 };
 
@@ -641,7 +649,9 @@ int main()
                 {
                     clear_screen();
                     printAsciiArt();
-                    cout << "\n==== Admin Panel ====\n";
+                   
+
+                    cout << "\n==== Hello " << name << " ====\n";
                     cout << "1. Add Book\n";
                     cout << "2. Remove Book\n";
                     cout << "3. Add Member\n";
@@ -718,7 +728,6 @@ int main()
             getline(cin, pass);
 
             bool is_member = library.verify_Member_bool(name, pass);
-           
 
             if (is_member)
             {
@@ -729,7 +738,7 @@ int main()
                 {
                     clear_screen();
                     printAsciiArt();
-                    cout << "\n==== Member Panel ====\n";
+                     cout << "\n==== Hello " << name << " ====\n";
                     cout << "1. Borrow Book\n";
                     cout << "2. Return Book\n";
                     cout << "3. List Borrowed Books\n";
