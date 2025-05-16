@@ -99,10 +99,11 @@ public:
 
     void mem_full_details()
     {
-        cout << "\nFull Details\n";
+        cout << "\nFull Profile\n";
         cout << "Name: " << name << endl;
         cout << "Member ID: " << memID << endl;
         cout << "Password: " << password << endl;
+        cout << "Number of borrowed Books: " << borrowed.size() << endl;
     }
 
     void setmem_details(string n, string id, string p)
@@ -393,7 +394,7 @@ private:
 public:
     Library()
     {
-        Admin a("admin", "shika noko");
+        Admin a("admin", "admin");
         admins.push_back(a);
     }
     Member *get_the_member(string name)
@@ -649,7 +650,6 @@ int main()
                 {
                     clear_screen();
                     printAsciiArt();
-                   
 
                     cout << "\n==== Hello " << name << " ====\n";
                     cout << "1. Add Book\n";
@@ -738,10 +738,11 @@ int main()
                 {
                     clear_screen();
                     printAsciiArt();
-                     cout << "\n==== Hello " << name << " ====\n";
+                    cout << "\n==== Hello " << name << " ====\n";
                     cout << "1. Borrow Book\n";
                     cout << "2. Return Book\n";
                     cout << "3. List Borrowed Books\n";
+                    cout << "4. Full Profile\n";
                     cout << "0. Back to Main Menu\n";
                     cout << "Enter your choice: ";
                     cin >> mem_choice;
@@ -755,9 +756,10 @@ int main()
                         library.return_book_by_member();
                         break;
                     case 3:
-
                         m->showBorrowedBooks();
-
+                        break;
+                    case 4:
+                        m->mem_full_details();
                         break;
                     case 0:
                         goto main_menu;
