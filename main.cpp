@@ -1,5 +1,6 @@
 #include <bits/stdc++.h>
 #include <cstdlib>
+#include <fstream>
 
 using namespace std;
 
@@ -41,6 +42,8 @@ public:
     Book(string t, string auth, string pub, int e, int av)
         : title(t), author(auth), publisher(pub), edition(e), quantity(av) {}
 
+    Book(string title) : title(title) {}
+
     void show_details() override
     {
         cout << "\nBook Details\n";
@@ -65,6 +68,7 @@ public:
     string get_author() { return author; }
     string get_publisher() { return publisher; }
     int get_edition() { return edition; }
+    int get_quantity() { return quantity; }
 
     void decrease_quantity()
     {
@@ -143,6 +147,11 @@ public:
             cout << "Invalid choice.\n";
             return "";
         }
+    }
+
+    void set_borrowed_books(const vector<Book> &b)
+    {
+        borrowed = b;
     }
 
     string borrow_book()
@@ -392,10 +401,19 @@ private:
     }
 
 public:
-    Library()
+
+
+    void load_member_from_csv(const string &filename);
+    void load_books_from_csv(const string &filename);
+    void load_admins_from_csv(const string &filename);
+
+    void set_books(const vector<Book> &b)
     {
-        Admin a("admin", "admin");
-        admins.push_back(a);
+        books = b;
+    }
+    void set_admins(const vector<Admin> &b)
+    {
+        admins = b;
     }
     Member *get_the_member(string name)
     {
@@ -605,6 +623,130 @@ public:
     }
 };
 
+void Library::load_member_from_csv(const string &filename)
+{
+
+    ifstream file(filename);
+
+    if (!file.is_open())
+    {
+        cerr << "Members csv file not opened\n";
+        return;
+    }
+
+    string line;
+    getline(file, line);
+
+    while (getline(file, line))
+    {
+        stringstream ss(line);
+
+        string name, memId, pass, borrowed_book_list;
+
+        getline(ss, name, ',');
+        getline(ss, memId, ',');
+        getline(ss, pass, ',');
+        getline(ss, borrowed_book_list);
+
+        Member m(name, memId, pass);
+
+        stringstream bb(borrowed_book_list);
+
+        string bookTitle;
+        vector<Book> blist;
+
+        while (getline(bb, bookTitle, ';'))
+        {
+            if (!bookTitle.empty())
+            {
+                Book b(bookTitle);
+                blist.push_back(b);
+            }
+        }
+
+        m.set_borrowed_books(blist);
+
+        members.push_back(m);
+    }
+    return;
+}
+void Library::load_books_from_csv(const string &filename)
+{
+
+    ifstream file(filename);
+
+    if (!file.is_open())
+    {
+        cerr << "Books csv file not opened\n";
+        return;
+    }
+
+    string line;
+    getline(file, line);
+    vector<Book> blist;
+
+    while (getline(file, line))
+    {
+        stringstream ss(line);
+
+        string title, author, pub, editionStr, quantityStr;
+        int edition;
+        int quantity;
+
+        getline(ss, title, ',');
+        getline(ss, author, ',');
+        getline(ss, pub, ',');
+        getline(ss, editionStr, ',');
+        getline(ss, quantityStr);
+
+        edition = stoi(editionStr);
+        quantity = stoi(quantityStr);
+
+        Book b(title, author, pub, edition, quantity);
+
+        blist.push_back(b);
+
+        set_books(blist);
+    }
+
+    return;
+}
+
+void Library::load_admins_from_csv(const string &filename)
+{
+
+    ifstream file(filename);
+
+    if (!file.is_open())
+    {
+        cerr << "Admins csv file not opened\n";
+        return;
+    }
+
+    string line;
+    getline(file, line);
+    vector<Admin> adminlist;
+
+    while (getline(file, line))
+    {
+        stringstream ss(line);
+
+        string name, pass;
+
+        getline(ss, name, ',');
+
+        getline(ss, pass);
+
+        Admin a(name, pass);
+
+        adminlist.push_back(a);
+
+        set_admins(adminlist);
+    }
+
+    return;
+}
+
 void clear_screen()
 {
 #ifdef _WIN32
@@ -616,8 +758,13 @@ void clear_screen()
 
 int main()
 {
+
     Library library;
     int main_choice;
+
+    library.load_member_from_csv("members.csv");
+    library.load_books_from_csv("books.csv");
+    library.load_admins_from_csv("admins.csv");
 
     while (true)
     {
@@ -669,33 +816,53 @@ int main()
                     switch (admin_choice)
                     {
                     case 1:
+                        clear_screen();
+                        printAsciiArt();
                         library.add_book();
                         break;
                     case 2:
+                        clear_screen();
+                        printAsciiArt();
                         library.remove_book();
                         break;
                     case 3:
+                        clear_screen();
+                        printAsciiArt();
                         library.add_member();
                         break;
                     case 4:
+                        clear_screen();
+                        printAsciiArt();
                         library.remove_member();
                         break;
                     case 5:
+                        clear_screen();
+                        printAsciiArt();
                         library.add_admin();
                         break;
                     case 6:
+                        clear_screen();
+                        printAsciiArt();
                         library.show_book_list();
                         break;
                     case 7:
+                        clear_screen();
+                        printAsciiArt();
                         library.show_member_list();
                         break;
                     case 8:
+                        clear_screen();
+                        printAsciiArt();
                         library.show_admin_list();
                         break;
                     case 9:
+                        clear_screen();
+                        printAsciiArt();
                         library.inquiry_books();
                         break;
                     case 10:
+                        clear_screen();
+                        printAsciiArt();
                         library.inquiry_members();
                         break;
                     case 0:
@@ -750,15 +917,23 @@ int main()
                     switch (mem_choice)
                     {
                     case 1:
+                        clear_screen();
+                        printAsciiArt();
                         library.giving_books();
                         break;
                     case 2:
+                        clear_screen();
+                        printAsciiArt();
                         library.return_book_by_member();
                         break;
                     case 3:
+                        clear_screen();
+                        printAsciiArt();
                         m->showBorrowedBooks();
                         break;
                     case 4:
+                        clear_screen();
+                        printAsciiArt();
                         m->mem_full_details();
                         break;
                     case 0:
