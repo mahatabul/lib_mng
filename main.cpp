@@ -82,6 +82,7 @@ public:
 class Member : public User
 {
     friend class Admin;
+    friend class Library;
 
 private:
     string name;
@@ -329,6 +330,7 @@ private:
     void addAdmin(string n = "", string pass = "")
     {
         Admin m(n, pass);
+        save_admin_to_csv(m);
         admins.push_back(m);
     }
 
@@ -401,11 +403,42 @@ private:
     }
 
 public:
-
-
     void load_member_from_csv(const string &filename);
     void load_books_from_csv(const string &filename);
     void load_admins_from_csv(const string &filename);
+
+    void save_admin_to_csv(Admin m)
+    {
+        ofstream file("admins.csv", ios::app);
+
+        if (!file.is_open())
+        {
+            cerr << "File not opened\n";
+            return;
+        }
+
+        file << m.get_name() << "," << m.get_password();
+
+        file.close();
+
+        return;
+    }
+    void save_member_to_csv(Member m)
+    {
+        ofstream file("members.csv", ios::app);
+
+        if (!file.is_open())
+        {
+            cerr << "File not opened\n";
+            return;
+        }
+
+        file << m.get_name() << "," << m.get_memID() << "," << m.get_password() << ",";
+
+        file.close();
+
+        return;
+    }
 
     void set_books(const vector<Book> &b)
     {
@@ -668,6 +701,7 @@ void Library::load_member_from_csv(const string &filename)
 
         members.push_back(m);
     }
+    file.close();
     return;
 }
 void Library::load_books_from_csv(const string &filename)
@@ -708,7 +742,7 @@ void Library::load_books_from_csv(const string &filename)
 
         set_books(blist);
     }
-
+    file.close();
     return;
 }
 
@@ -743,7 +777,7 @@ void Library::load_admins_from_csv(const string &filename)
 
         set_admins(adminlist);
     }
-
+    file.close();
     return;
 }
 
