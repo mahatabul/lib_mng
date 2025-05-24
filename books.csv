@@ -1,6 +1,7 @@
 Title,Author,Publisher,Edition,Quantity
 The C++ Programming Language,Bjarne Stroustrup,Addison-Wesley,2004,11
-Clean Code,Robert C. Martin,Prentice Hall,2001,22
+Clean Code,Robert C. Martin,Prentice Hall,2001,21
 Design Patterns,Erich Gamma,Addison-Wesley,2011,33
 Introduction to Algorithms,Thomas H. Cormen,MIT Press,2013,44
 Atomic Habits,James Clear,Avery,2001,55
+Think Python,Allen B. Downey ,O'REILLY,2019,11

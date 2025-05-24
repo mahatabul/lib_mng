@@ -407,6 +407,10 @@ public:
     void load_books_from_csv(const string &filename);
     void load_admins_from_csv(const string &filename);
 
+    void unload_member_to_csv(const string &filename);
+    void unload_books_to_csv(const string &filename);
+    void unload_admins_to_csv(const string &filename);
+
     void save_admin_to_csv(Admin m)
     {
         ofstream file("admins.csv", ios::app);
@@ -433,7 +437,7 @@ public:
             return;
         }
 
-        file << m.get_name() << "," << m.get_memID() << "," << m.get_password() << ",";
+        file << m.get_name() << "," << m.get_memID() << "," << m.get_password();
 
         file.close();
 
@@ -781,6 +785,86 @@ void Library::load_admins_from_csv(const string &filename)
     return;
 }
 
+void Library::unload_member_to_csv(const string &filename)
+{
+
+    ofstream file(filename, ios::out);
+
+    if (!file.is_open())
+    {
+        cerr << "Members csv file not opened\n";
+        return;
+    }
+
+    file << "Name,MemberID,Password,BorrowedBooks\n";
+
+    vector<Member> memlist = members;
+
+    for (auto i = 0; i < memlist.size(); i++)
+    {
+        vector<Book> booklist = memlist[i].borrowed;
+
+        file << memlist[i].get_name() << "," << memlist[i].get_memID() << "," << memlist[i].get_password() << ",";
+        
+        for (int j = 0; j < booklist.size(); j++)
+        {
+            file << booklist[j].get_title();
+            if (j < booklist.size() - 1)
+            {
+                file << ";";
+            }
+        }
+        file << "\n";
+    }
+
+    file.close();
+    return;
+}
+
+void Library::unload_books_to_csv(const string &filename)
+{
+
+    ofstream file(filename, ios::out);
+
+    if (!file.is_open())
+    {
+        cerr << "Books csv file not opened\n";
+        return;
+    }
+
+    file << "Title,Author,Publisher,Edition,Quantity\n";
+    vector<Book> blist = books;
+
+    for (auto i = 0; i < blist.size(); i++)
+    {
+        file << blist[i].get_title() << "," << blist[i].get_author() << "," << blist[i].get_publisher() << "," << blist[i].get_edition() << "," << blist[i].get_quantity() << "\n";
+    }
+    file.close();
+    return;
+}
+
+void Library::unload_admins_to_csv(const string &filename)
+{
+
+    ofstream file(filename, ios::out);
+
+    if (!file.is_open())
+    {
+        cerr << "Admins csv file not opened\n";
+        return;
+    }
+
+    file << "Name" << "," << "Password\n";
+    vector<Admin> adminlist = admins;
+
+    for (auto i = 0; i < adminlist.size(); i++)
+    {
+        file << adminlist[i].get_name() << "," << adminlist[i].get_password() << "\n";
+    }
+    file.close();
+    return;
+}
+
 void clear_screen()
 {
 #ifdef _WIN32
@@ -1004,6 +1088,10 @@ int main()
     main_menu:
         continue;
     }
+
+    library.unload_admins_to_csv("admins.csv");
+    library.unload_books_to_csv("books.csv");
+    library.unload_member_to_csv("members.csv");
 
     return 0;
 }
